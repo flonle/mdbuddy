@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="wa-dark wa-cloak">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{{.Title}}</title>
+
+		<script src="https://kit.webawesome.com/f8a69405763a401b.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/native.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/themes/default.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/utilities.css" type="text/css">
+		{{block "head" .}}{{end}}
+	</head>
+	<body>
+
+		<!-- 1. The Trigger -->
+		<input type="checkbox" id="sidebar-toggle">
+
+		<!-- 2. The Dimmed Overlay (New) -->
+		<!-- Acts as a massive 'Close' button covering the content -->
+		<label for="sidebar-toggle" class="page-overlay"></label>
+
+		<!-- 3. Header (Fixed Z-Index: 20) -->
+		<header class="header">
+			<label for="sidebar-toggle" class="hamburger" aria-label="Toggle Menu">
+				&#9776;
+			</label>
+			{{block "header" .}}{{end}}
+		</header>
+
+		<!-- 4. Layout Container -->
+		<div class="layout-container">
+
+			<!-- Sidebar (Mobile Z-Index: 16) -->
+			<nav class="sidebar">
+				<div class="scroll-content">
+					{{block "sidebar" .}}{{end}}
+				</div>
+			</nav>
+
+			<!-- Main Area (Z-Index: 0) -->
+			<main class="main-wrapper">
+				<div class="main-content">
+					{{block "main" .}}{{end}}
+				</div>
+			</main>
+
+			<!-- Outline -->
+			<aside class="outline">
+				<div class="scroll-content">
+					{{block "outline" .}}{{end}}
+				</div>
+			</aside>
+		</div>
+
+		<!-- Scroll Script -->
+		<script>
+			const body = document.body;
+			let lastScroll = 0;
+			
+			window.addEventListener('scroll', () => {
+				const currentScroll = window.pageYOffset;
+				const toggle = document.getElementById('sidebar-toggle');
+				
+				// Prevent header from hiding if at top OR if menu is open
+				if (currentScroll <= 0 || (toggle && toggle.checked)) {
+					body.classList.remove('scroll-down');
+					return;
+				}
+				
+				if (currentScroll > lastScroll && currentScroll > 60) {
+					body.classList.add('scroll-down');
+					} else if (currentScroll < lastScroll) {
+						body.classList.remove('scroll-down');
+					}
+					lastScroll = currentScroll;
+					});
+		</script>
+	</body>
+</html>

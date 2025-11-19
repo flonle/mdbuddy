@@ -1,0 +1,160 @@
+:root {
+  --sidebar-width: 250px;
+  --outline-width: 250px;
+  --main-max-width: 80ch;
+  --header-height: 60px;
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  padding-top: var(--header-height);
+}
+
+/* --- Logic: Checkbox & Overlay --- */
+#sidebar-toggle {
+  display: none;
+}
+
+/* The new Overlay Layer */
+.page-overlay {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Dimming effect */
+  z-index: 15;
+  /* Above content(0), Below Sidebar(16) & Header(20) */
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  /* Optional: Blur effect */
+}
+
+/* --- Header --- */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background-color: #333;
+  color: white;
+  z-index: 20;
+  /* Highest priority */
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1rem;
+  transition: transform var(--transition-speed) ease;
+}
+
+.hamburger {
+  display: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  user-select: none;
+}
+
+/* Scroll Hide Logic */
+body.scroll-down .header {
+  transform: translateY(-100%);
+}
+
+/* --- Layout --- */
+.layout-container {
+  display: flex;
+  align-items: flex-start;
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* --- Sticky Columns --- */
+.sidebar,
+.outline {
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 1rem;
+  transition: top var(--transition-speed) ease, height var(--transition-speed) ease;
+}
+
+body.scroll-down .sidebar,
+body.scroll-down .outline {
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: #f4f4f4;
+  border-right: 1px solid #ddd;
+}
+
+.outline {
+  width: var(--outline-width);
+  background: #eaeaea;
+  border-left: 1px solid #ddd;
+}
+
+/* --- Main --- */
+.main-wrapper {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.main-content {
+  max-width: var(--main-max-width);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* --- Responsive & Toggle Logic --- */
+
+@media (max-width: 1200px) {
+  .hamburger {
+    display: block;
+  }
+
+  /* 1. Sidebar Mobile State */
+  .sidebar {
+    display: none;
+    position: fixed;
+    z-index: 16;
+    /* Higher than Overlay(15), Lower than Header(20) */
+    left: 0;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    width: var(--sidebar-width);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 2. Toggle Visibility: Checkbox Checked */
+
+  /* Show Overlay */
+  #sidebar-toggle:checked~.page-overlay {
+    display: block;
+    【0】
+  }
+
+  /* Show Sidebar */
+  #sidebar-toggle:checked~.layout-container .sidebar {
+    display: block;
+    【1】
+  }
+}
+
+@media (max-width: 900px) {
+  .outline {
+    display: none;
+  }
+}
