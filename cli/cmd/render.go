@@ -20,21 +20,21 @@ var renderCmd = &cobra.Command{
 	Long: `Render a single markdown file to HTML and print to stdout.
 
 This is useful for one-off rendering or integration with other tools.
-
-Examples:
-	mdbuddy render README.md
-	mdbuddy render docs/guide.md > output.html
-	echo "# Hello" | mdbuddy render
-	mdbuddy render input.md --output result.html
-`,
-	Args: cobra.MaximumNArgs(1),
+The resulting HTML is completely self-contained.`,
+	Example: `  mdbuddy render README.md
+  mdbuddy render docs/guide.md > output.html
+  echo "# Hello" | mdbuddy render
+  mdbuddy render input.md --output result.html`,
+	Args: cobra.ExactArgs(1),
 	RunE: runRender,
 }
 
 func runRender(cmd *cobra.Command, args []string) error {
+	var err error
+
+	// Get input
 	var input []byte
 	var inputFile string
-	var err error
 	if len(args) == 0 {
 		input, err = readStdin()
 		if err != nil {
@@ -51,23 +51,23 @@ func runRender(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Get output file
-	var outputFile io.Writer
+	// Get output
+	var output io.Writer
 	outputFileName, _ := cmd.Flags().GetString("output")
 	if outputFileName != "" {
-		outputFile, err = os.Create(outputFileName)
+		output, err = os.Create(outputFileName)
 		if err != nil {
 			return fmt.Errorf("failed to write output file: %w", err)
 		}
 	} else {
-		outputFile = os.Stdout
+		output = os.Stdout
 	}
 
-	// Render
-	renderer.Render(input, outputFile)
+	// Render input to output
+	renderer.RenderBareNote(input, output)
 
-	// Some extra info on stdin, if it isn't used to print the HTML
-	if outputFile != os.Stdout {
+	// Some extra info on stdin, if it isn't already used to print the HTML
+	if output != os.Stdout {
 		if inputFile != "" {
 			fmt.Printf("✅ Rendered %s → %s\n", inputFile, outputFileName)
 		} else {
@@ -78,6 +78,7 @@ func runRender(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// Read & return stdin as []byte
 func readStdin() ([]byte, error) {
 	// Check if stdin has data
 	stat, err := os.Stdin.Stat()

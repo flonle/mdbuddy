@@ -1,5 +1,7 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.6 h1:XJtiaUW6dEEqVuZiMTn1ldk455QWwEIsMIJlo5vtkx0=
+github.com/flonle/mdbuddy/assets v0.0.0/go.mod h1:MhD9vfRLRGYyTLzNuF9gxuhK8d06gwZonTfeTD/0xjg=
 github.com/flonle/mdbuddy/core v0.0.0-20251119170301-541eeb095d47/go.mod h1:kVP5G5wto6HPiMQzsgOlrovkWvDB05iT0ztSQJn1s5w=
+github.com/flonle/mdbuddy/renderer v0.0.0/go.mod h1:0xoKP0LOTcvTkd+SrMzLyfU3aRXSy2WupPbz1I3dvTg=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/stretchr/objx v0.1.0 h1:4G4v2dO3VZwixGIRoQ5Lfboy6nUhCyYzaqnIAPPhYs4=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=

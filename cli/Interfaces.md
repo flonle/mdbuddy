@@ -2,7 +2,60 @@
 
 #go #dev 
 
+
+sdfasdf
+
+lala
+sdfsdf
+[link test](https://google.com)!
+another test sdfsdf
 Interfaces are **named collections of method signatures**.
+Some *italic text too just to see*.
+
+ How about a footnote[^1]
+
+[^1]: My reference is cool!
+
+> A quote! Wauw. So good.
+
+Now for a list:
+
+- one
+- two
+- three
+    - indent
+    - another indent
+
+And not for an ordered list!
+
+1) Something
+1) Some other thing
+1) Some even other thing
+
+Now for a TODO:
+
+- [ ] something
+- [ ] another thing
+- [x] a finished thing!
+
+
+> [!faq] My title
+> My first line
+> My second line
+> My third line
+> My fourth line
+> My fifth line
+> My sixth line
+> My seventh line
+> My eighth line
+> My ninth `line` 
+> ```py
+> def test():
+>     return None
+> ```
+> something *else*
+
+
 We define it like so:
 
 ```go

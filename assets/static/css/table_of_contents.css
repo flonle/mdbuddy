@@ -1,0 +1,33 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.table-of-contents ul:first-of-type {
+  border-inline-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+
+  ul {
+    /* avoid recursion */
+    border-inline-start: none;
+  }
+}
+
+.table-of-contents ul {
+  list-style: none;
+}
+
+.table-of-contents li a {
+  text-decoration: none;
+  color: var(--wa-color-text-normal);
+  font-size: var(--wa-font-size-s);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.table-of-contents {
+  .current {
+    font-weight: var(--wa-font-weight-bold);
+    text-decoration-style: solid;
+  }
+}

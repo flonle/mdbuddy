@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" class="wa-dark wa-cloak">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{{.Title}}</title>
+
+		<script src="https://kit.webawesome.com/f8a69405763a401b.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/native.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/themes/default.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/utilities.css" type="text/css">
+		<style>{{.CSS}}</style>
+	</head>
+	<body>
+		<div class="layout-container">
+
+			<!-- Sidebar (Mobile Z-Index: 16) -->
+			<!-- <nav class="sidebar"> -->
+			<!-- <div class="scroll-content"> -->
+			<!-- </div> -->
+			<!-- </nav> -->
+
+			<!-- Main Area (Z-Index: 0) -->
+			<main class="main-wrapper">
+				<div class="main-content">
+					{{.Content}}
+				</div>
+			</main>
+
+			<!-- Outline -->
+			{{if .TOC}}
+			<aside class="outline">
+				<div class="table-of-contents">
+					{{.TOC}}
+				</div>
+			</aside>
+			{{end}}
+		</div>
+
+		<script>{{.JS}}</script>
+	</body>
+</html>

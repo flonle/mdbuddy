@@ -1,4 +1,4 @@
-const getLinks = () => [...document.querySelectorAll('#outline-standard a')];
+const getLinks = () => [...document.querySelectorAll('.table-of-contents a')];
 const linkTargets = new WeakMap();
 const visibleTargets = new WeakSet();
 const observer = new IntersectionObserver(handleIntersect, { rootMargin: '0px 0px' });
@@ -35,7 +35,7 @@ function updateLinks() {
 function observeLinks() {
   getLinks().forEach(link => {
     const hash = link.hash.slice(1);
-    const target = hash ? document.querySelector(`#content #${hash}`) : null;
+    const target = hash ? document.querySelector(`.main-content #${hash}`) : null;
 
     if (target) {
       linkTargets.set(link, target);

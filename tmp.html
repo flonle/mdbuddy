@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" class="wa-dark wa-cloak">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>test</title>
+
+		<script src="https://kit.webawesome.com/f8a69405763a401b.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/native.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/themes/default.css" type="text/css">
+		<link rel="stylesheet" href="https://ka-f.webawesome.com/kit/f8a69405763a401b/webawesome@3.0.0/styles/utilities.css" type="text/css">
+		<style>:root {
+  --sidebar-width: 250px;
+  --outline-width: 250px;
+  --main-max-width: 80ch;
+  --wa-link-decoration-default: color-mix(in oklab, currentColor 70%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+blockquote {
+  padding: var(--wa-space-xs);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.anchor {
+  opacity: 0;
+  visibility: hidden;
+  text-decoration: none;
+  transition: opacity var(--wa-transition-normal) var(--wa-transition-easing);
+}
+
+@media (hover: hover) {
+
+  h1:hover .anchor,
+  h2:hover .anchor,
+  h3:hover .anchor,
+  h4:hover .anchor,
+  h5:hover .anchor,
+  h6:hover .anchor,
+  .anchor:hover {
+    opacity: 1;
+    visibility: visible;
+    padding: var(--wa-space-3xs);
+  }
+}
+
+/* --- Layout --- */
+.layout-container {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* --- Sticky Outline --- */
+.outline {
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: top var(--wa-transition-normal) ease, height var(--wa-transition-normal) ease;
+  width: var(--outline-width);
+  padding: var(--wa-space-xl);
+}
+
+/* --- Main --- */
+.main-wrapper {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.main-content {
+  max-width: var(--main-max-width);
+  margin: 0 auto;
+  padding: var(--wa-space-xl);
+}
+
+@media (max-width: 900px) {
+  .outline {
+    display: none;
+  }
+}html {
+  scroll-behavior: smooth;
+}
+
+.table-of-contents ul:first-of-type {
+  border-inline-start: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+
+  ul {
+    /* avoid recursion */
+    border-inline-start: none;
+  }
+}
+
+.table-of-contents ul {
+  list-style: none;
+}
+
+.table-of-contents li a {
+  text-decoration: none;
+  color: var(--wa-color-text-normal);
+  /* font-weight: var(--wa-font-weight-semibold); */
+  font-size: var(--wa-font-size-s);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.table-of-contents {
+  .current {
+    font-weight: var(--wa-font-weight-bold);
+    text-decoration-style: solid;
+  }
+}</style>
+	</head>
+	<body>
+		<div class="layout-container">
+
+			
+			
+			
+			
+			
+
+			
+			<main class="main-wrapper">
+				<div class="main-content">
+					<p><wa-tag size="small" appearance="filled" pill><a href="/tags/"dev">#dev</a></wa-tag></p>
+<p>The Bayer-Moore string-search algorithm is an efficient algorithm for searching strings for certain literals.</p>
+<p><a href="Modelling%20Downwards%20Vertical%20Motion.md">Modelling Downwards Vertical Motion.md</a><br />
+<a href="Modelling%20Downwards%20Vertical%20Motion.md">title</a></p>
+<wa-callout variant="brand"><wa-icon slot="icon" name="star" variant="regular"></wa-icon><strong>regex</strong><br /><p>Regex search tools like grep will make heavy use of this algorithm. It, and similar tools, will do something called &quot;literal optimizations&quot;.<br />
+For example, If the input pattern for a grep search is &quot;test&quot;, then grep does not need to invoke the <a href="Regular%20Expressions.html">regex</a> engine at all: it can just scan the text corpus for the literal string &quot;test&quot; using Bayer-Moore.</p>
+<p>A lot of regular expressions contain literals in some way, and are thus subject to literal optimizations. A search engine just needs to extract them:</p>
+<ul>
+<li><code>foo|bar</code> -&gt; detects  <code>foo</code> and <code>bar</code></li>
+<li><code>(a|b)c</code> -&gt; detects <code>ac</code> and <code>bc</code></li>
+<li><code>[ab]foo[yz]</code> -&gt; detects <code>afooy</code>, <code>afooz</code>, <code>bfooy</code>, and <code>bfooz</code></li>
+<li><code>(foo{3,6})</code> -&gt; detects <code>foofoofoo</code></li>
+</ul>
+<p>Once extracted, the program can search for (one of) the literal(s). Only when it detects a match, will it drop down into the regex engine to verify the candidate against the full regular expression.</p>
+</wa-callout><p>It preprocesses the string being searched for (the pattern), but not the string being searched (the text). This makes it particularly useful for searching long texts for a short pattern. In general, the algorithm runs faster as the pattern length increases.</p>
+<h2 id="mechanics">Mechanics <a class="anchor" href="#mechanics">#</a></h2>
+<ul>
+<li>It matches on the tail of the pattern rather than the head</li>
+<li>It skips along the text in jumps of multiple characters, instead of iterating over every character</li>
+</ul>
+<p>First, you align your pattern to the start of the text.<br />
+If your pattern has a length of 5, you start by checking the fifth character in the text (the tail). If it is not a match, <em>you can safely ignore the first 4 characters</em>, because they simply cannot be part of a complete match with the pattern.</p>
+<p>If a character does not match <em>any</em> of the characters in the pattern, we can skip ahead by 
+<math style="font-feature-settings: 'dtls' off;" xmlns="http://www.w3.org/1998/Math/MathML" display="inline" class="math-textstyle">
+  <semantics>
+    <mrow>
+      <mi>m</mi>
+    </mrow>
+    <annotation encoding="application/x-tex">m</annotation>
+  </semantics>
+</math>
+v</p>
+<p>If a character in the text <em>is</em> in the pattern, then a partial shift of the pattern along the text is done, as to line up the matching character.</p>
+<pre><code>A N P A N M A N
+---------------
+P A N - - - - -  &lt;- P in in pan, shift by 2
+- P A N - - - -
+- - P A N - - -  &lt;- match! &amp; shift by 1
+- - - P A N - -  &lt;- m is not in pan, shift by 3 (not enough characters left)
+- - - - P A N -
+- - - - - P A N
+</code></pre>
+<blockquote>
+<p>Alignments of pattern &quot;PAN&quot; to text &quot;ANPANMAN&quot;.<br />
+Alignments without an arrow (<code>&lt;-</code>) are skipped by the Bayer-Moore algorithm.</p>
+</blockquote>
+<p>The shift rules are implemented as constant-time table lookups, using tables generated during the preprocessing of the pattern.</p>
+<h3 id="shift-rules">Shift Rules <a class="anchor" href="#shift-rules">#</a></h3>
+<h4 id="the-bad-character-rule">The Bad-character Rule <a class="anchor" href="#the-bad-character-rule">#</a></h4>
+<p>The most obvious. If a character did not match, but it is part of the pattern; shift the pattern so that the the text characters aligns with the relevant pattern character.<br />
+if a character did not match, and is not part of the pattern; shift the entire pattern past the point of mismatch.</p>
+<h4 id="the-good-suffix-rule">The Good-suffix Rule <a class="anchor" href="#the-good-suffix-rule">#</a></h4>
+<p>Markedly more complex than the bad-character rule. Omitted from the document, for now.</p>
+<h3 id="example-shift-table">Example Shift Table <a class="anchor" href="#example-shift-table">#</a></h3>
+<pre><code>Index| Mismatch | Shift
+-----+----------+------
+ 0   |         N|   1    
+ 1   |        AN|   8    
+ 2   |       MAN|   3    
+ 3   |      NMAN|   6   
+ 4   |     ANMAN|   6   
+ 5   |    PANMAN|   6  
+ 6   |   NPANMAN|   6  
+ 7   |  ANPANMAN|   6
+</code></pre>
+<blockquote>
+<p>A shift table as a result of preprocessing the pattern &quot;ANPANMAN&quot;. Both the bad-character rule as well as the good-suffix rule were used to generate it.</p>
+</blockquote>
+
+				</div>
+			</main>
+
+			
+			
+			<aside class="outline">
+				<div class="table-of-contents">
+					<ul>
+<li>
+<a href="#mechanics">Mechanics</a><ul>
+<li>
+<a href="#shift-rules">Shift Rules</a><ul>
+<li>
+<a href="#the-bad-character-rule">The Bad-character Rule</a></li>
+<li>
+<a href="#the-good-suffix-rule">The Good-suffix Rule</a></li>
+</ul>
+</li>
+<li>
+<a href="#example-shift-table">Example Shift Table</a></li>
+</ul>
+</li>
+</ul>
+
+				</div>
+			</aside>
+			
+		</div>
+
+		<script>const getLinks = () => [...document.querySelectorAll('.table-of-contents a')];
+const linkTargets = new WeakMap();
+const visibleTargets = new WeakSet();
+const observer = new IntersectionObserver(handleIntersect, { rootMargin: '0px 0px' });
+
+function handleIntersect(entries) {
+  entries.forEach(entry => {
+    // Remember which targets are visible
+    if (entry.isIntersecting) {
+      visibleTargets.add(entry.target);
+    } else {
+      visibleTargets.delete(entry.target);
+    }
+  });
+
+  updateLinks();
+}
+
+function updateLinks() {
+  const links = getLinks();
+  // Find the first visible target and activate the respective link
+  links.find(link => {
+    const target = linkTargets.get(link);
+
+    if (target && visibleTargets.has(target)) {
+      links.forEach(el => el.classList.toggle('current', el === link));
+      return true;
+    }
+
+    return false;
+  });
+}
+
+// Observe link targets
+function observeLinks() {
+  getLinks().forEach(link => {
+    const hash = link.hash.slice(1);
+    const target = hash ? document.querySelector(`.main-content #${hash}`) : null;
+
+    if (target) {
+      linkTargets.set(link, target);
+      observer.observe(target);
+    }
+  });
+}
+
+observeLinks();
+
+document.addEventListener('DOMContentLoaded', updateLinks);
+document.addEventListener('DOMContentLoaded', observeLinks);
+</script>
+	</body>
+</html>

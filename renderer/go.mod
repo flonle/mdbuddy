@@ -1,13 +1,14 @@
 module github.com/flonle/mdbuddy/renderer
 
-go 1.25.2
+go 1.25.4
 
 require (
-	github.com/flonle/mdbuddy/assets v0.0.0
 	github.com/alecthomas/chroma/v2 v2.20.0
+	github.com/flonle/mdbuddy/assets v0.0.0
 	github.com/wyatt915/goldmark-treeblood v0.0.1
 	github.com/yuin/goldmark v1.7.13
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
+	go.abhg.dev/goldmark/anchor v0.2.0
 	go.abhg.dev/goldmark/hashtag v0.4.0
 	go.abhg.dev/goldmark/toc v0.12.0
 	go.abhg.dev/goldmark/wikilink v0.6.0

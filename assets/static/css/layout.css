@@ -21,7 +21,6 @@ body {
   display: none;
 }
 
-/* The new Overlay Layer */
 .page-overlay {
   display: none;
   /* Hidden by default */
@@ -36,7 +35,6 @@ body {
   /* Above content(0), Below Sidebar(16) & Header(20) */
   cursor: pointer;
   backdrop-filter: blur(2px);
-  /* Optional: Blur effect */
 }
 
 /* --- Header --- */
@@ -46,8 +44,8 @@ body {
   left: 0;
   right: 0;
   height: var(--header-height);
-  background-color: #333;
-  color: white;
+  /* background-color: #333; */
+  /* color: white; */
   z-index: 20;
   /* Highest priority */
   display: flex;
@@ -96,13 +94,13 @@ body.scroll-down .outline {
 
 .sidebar {
   width: var(--sidebar-width);
-  background: #f4f4f4;
+  /* background: #f4f4f4; */
   border-right: 1px solid #ddd;
 }
 
 .outline {
   width: var(--outline-width);
-  background: #eaeaea;
+  /* background: #eaeaea; */
   border-left: 1px solid #ddd;
 }
 
@@ -125,7 +123,6 @@ body.scroll-down .outline {
     display: block;
   }
 
-  /* 1. Sidebar Mobile State */
   .sidebar {
     display: none;
     position: fixed;
@@ -138,18 +135,14 @@ body.scroll-down .outline {
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
   }
 
-  /* 2. Toggle Visibility: Checkbox Checked */
-
   /* Show Overlay */
   #sidebar-toggle:checked~.page-overlay {
     display: block;
-    【0】
   }
 
   /* Show Sidebar */
   #sidebar-toggle:checked~.layout-container .sidebar {
     display: block;
-    【1】
   }
 }
 
