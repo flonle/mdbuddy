@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	// "time"
 	"unsafe"
 
@@ -25,6 +26,9 @@ type previewServer struct {
 	inotifyInstanceFD int            // The inotify instance file descriptor
 	watches           map[int]string // watch descriptor : (absolute) path
 	previewFile       string         // The last changed markdown file
+	previewFileMx     sync.RWMutex   // Protects previewFile
+	refreshClients    []chan string  // Connected SSE clients
+	refreshClientsMx  sync.Mutex     // Protects refreshClients
 }
 
 // Start a server that serves a preview of the last changed file
@@ -56,6 +60,9 @@ func ServePreview(addr string, paths []string) error {
 		server.addWatchRecursively(absPath)
 	}
 
+	// Start watching inotify events
+	go server.watchInotify()
+
 	// Start HTTP server
 	http.HandleFunc("/", server.servePreview)
 	http.HandleFunc("/sse-refresh", server.handleSSERefresh)
@@ -77,18 +84,9 @@ func (s *previewServer) servePreview(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderBareNote(input, w)
 }
 
-func (s *previewServer) handleSSERefresh(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	flusher, ok := w.(http.Flusher)
-	if !ok {
-		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
-		return
-	}
-
+// Start watching the Inotify instance and broadcast file change to all SSE clients.
+// Blocking!
+func (s *previewServer) watchInotify() {
 	buf := make([]byte, unix.SizeofInotifyEvent*4096)
 	for {
 		n, err := unix.Read(s.inotifyInstanceFD, buf)
@@ -110,22 +108,124 @@ func (s *previewServer) handleSSERefresh(w http.ResponseWriter, r *http.Request)
 			}
 
 			if strings.HasSuffix(filename, ".md") {
+				fullPath := filepath.Join(path, filename)
 				log.Println("sending refresh signal")
-				s.previewFile = filepath.Join(path, filename)
-				w.Write([]byte("data: refresh\n\n"))
-				flusher.Flush()
+
+				s.previewFileMx.Lock()
+				s.previewFile = fullPath
+				s.previewFileMx.Unlock()
+
+				go s.broadcastRefresh(fullPath)
 			}
 
 			// Print event description
-			fmt.Printf("[%s] ", path)
-			if filename != "" {
-				fmt.Printf("%s: ", filename)
-			}
-			fmt.Println(describeEvent(event.Mask))
+			// fmt.Printf("[%s] ", path)
+			// if filename != "" {
+			// 	fmt.Printf("%s: ", filename)
+			// }
+			// fmt.Println(describeEvent(event.Mask))
 
 			offset += unix.SizeofInotifyEvent + nameLen
 		}
 	}
+}
+
+// Send a refresh signal to all connected SSE clients
+func (s *previewServer) broadcastRefresh(path string) {
+	s.refreshClientsMx.Lock()
+	defer s.refreshClientsMx.Unlock()
+
+	for _, ch := range s.refreshClients {
+		select {
+		case ch <- path:
+		default:
+			// Client channel full, skip
+		}
+	}
+}
+
+// Add a new SSE client channel
+func (s *previewServer) registerClient(ch chan string) {
+	s.refreshClientsMx.Lock()
+	s.refreshClients = append(s.refreshClients, ch)
+	s.refreshClientsMx.Unlock()
+}
+
+// Remove an SSE client channel
+func (s *previewServer) unregisterClient(ch chan string) {
+	s.refreshClientsMx.Lock()
+	defer s.refreshClientsMx.Unlock()
+
+	for i, client := range s.refreshClients {
+		if client == ch {
+			s.refreshClients = append(s.refreshClients[:i], s.refreshClients[i+1:]...)
+			close(ch)
+			break
+		}
+	}
+}
+
+func (s *previewServer) handleSSERefresh(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// Create flusher
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	// Create channel for this client
+	refreshCh := make(chan string)
+	s.registerClient(refreshCh)
+	defer s.unregisterClient(refreshCh)
+
+	// Listen for refresh signals
+	for {
+		select {
+		case <-refreshCh:
+			w.Write([]byte("data: refresh\n\n"))
+			flusher.Flush()
+		case <-r.Context().Done():
+			// Client disconnected
+			return
+		}
+	}
+
+	// buf := make([]byte, unix.SizeofInotifyEvent*4096)
+	// for {
+	// 	n, err := unix.Read(s.inotifyInstanceFD, buf)
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to read events: %v", err)
+	// 	}
+
+	// 	offset := 0
+	// 	for offset < n {
+	// 		event := (*unix.InotifyEvent)(unsafe.Pointer(&buf[offset]))
+	// 		path := s.watches[int(event.Wd)]
+
+	// 		// Extract filename if present
+	// 		nameLen := int(event.Len)
+	// 		var filename string
+	// 		if nameLen > 0 {
+	// 			nameBytes := buf[offset+unix.SizeofInotifyEvent : offset+unix.SizeofInotifyEvent+nameLen]
+	// 			filename = string(nameBytes[:clen(nameBytes)])
+	// 		}
+
+	// 		// Send refresh signal
+	// 		if strings.HasSuffix(filename, ".md") {
+	// 			log.Println("sending refresh signal")
+	// 			s.previewFile = filepath.Join(path, filename)
+	// 			w.Write([]byte("data: refresh\n\n"))
+	// 			flusher.Flush()
+	// 		}
+
+	// 		offset += unix.SizeofInotifyEvent + nameLen
+	// 	}
+	// }
 }
 
 func clen(b []byte) int {
@@ -135,63 +235,6 @@ func clen(b []byte) int {
 		}
 	}
 	return len(b)
-}
-
-func describeEvent(mask uint32) string {
-	events := []string{}
-
-	if mask&unix.IN_ACCESS != 0 {
-		events = append(events, "ACCESS")
-	}
-	if mask&unix.IN_MODIFY != 0 {
-		events = append(events, "MODIFY")
-	}
-	if mask&unix.IN_ATTRIB != 0 {
-		events = append(events, "ATTRIB")
-	}
-	if mask&unix.IN_CLOSE_WRITE != 0 {
-		events = append(events, "CLOSE_WRITE")
-	}
-	if mask&unix.IN_CLOSE_NOWRITE != 0 {
-		events = append(events, "CLOSE_NOWRITE")
-	}
-	if mask&unix.IN_OPEN != 0 {
-		events = append(events, "OPEN")
-	}
-	if mask&unix.IN_MOVED_FROM != 0 {
-		events = append(events, "MOVED_FROM")
-	}
-	if mask&unix.IN_MOVED_TO != 0 {
-		events = append(events, "MOVED_TO")
-	}
-	if mask&unix.IN_CREATE != 0 {
-		events = append(events, "CREATE")
-	}
-	if mask&unix.IN_DELETE != 0 {
-		events = append(events, "DELETE")
-	}
-	if mask&unix.IN_DELETE_SELF != 0 {
-		events = append(events, "DELETE_SELF")
-	}
-	if mask&unix.IN_MOVE_SELF != 0 {
-		events = append(events, "MOVE_SELF")
-	}
-	if mask&unix.IN_ISDIR != 0 {
-		events = append(events, "ISDIR")
-	}
-	if mask&unix.IN_IGNORED != 0 {
-		events = append(events, "IGNORED")
-	}
-
-	if len(events) == 0 {
-		return fmt.Sprintf("UNKNOWN(0x%x)", mask)
-	}
-
-	result := events[0]
-	for i := 1; i < len(events); i++ {
-		result += " | " + events[i]
-	}
-	return result
 }
 
 // Add a new inotify watch for the given path. If that path is a directory,

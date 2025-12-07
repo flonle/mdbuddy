@@ -2,8 +2,6 @@ const eventSource = new EventSource('/sse-refresh');
 
 eventSource.onmessage = (event) => {
   eventSource.close();
-  // console.log("I would reload now!");
-  // console.log(Date.now());
   location.reload();
 };
 
