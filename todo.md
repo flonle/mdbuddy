@@ -1,10 +1,5 @@
 # TODO
 
-## Stage 1: MVP
-
-The MVP is just a Core + CLI that can convert gfm to HTML, but also supports syntax highlighting, mathml, hashtags, footnote, callouts.
-Mathml is fine for now with my PR merged into treeblood. In the future, when encountering problems, we might want to use a more stable Rust implementation and call it with FFI.
-
 - [ ] Fix checkboxes centering
 - [x] Custom Goldmark module to render callout as `<wa-callout>` (or, dynamically, and add to Goldmark readme)
 - [x] Hashtags just do `class=hastag` yucky yuck: either make one that renders `wa-tag size="small" pill>`, or also make dynamic and add to Goldmark readme.
@@ -12,7 +7,7 @@ Mathml is fine for now with my PR merged into treeblood. In the future, when enc
 - [x] Test quoteblock
 - [x] Test anchor (https://github.com/abhinav/goldmark-anchor); copy anchor visuals from web awesome documentation
 - [x] Let's just wrap render output with a template which includes webawesome import and my css file, and just a single `<main>` with a max-width or whatever so its readable. Can still update later, but without wa-page
-- [x] table of contents in the right-hand aside. https://github.com/abhinav/goldmark-toc could be used. Also copy javascript to highlight current heading from web awesome documentation (cant really copy)
+- [x] table of contents in the right-hand aside. https://github.com/abhinav/goldmark-toc could be used. Also make JS to highlight current visible heading
 - [x] fix FOUC and FOUCE
 - [x] Make page layout adaptive
 - Add styling to override native.css for the following:
@@ -20,21 +15,14 @@ Mathml is fine for now with my PR merged into treeblood. In the future, when enc
   - [x] blockquote padding needs to be `var(--wa-space-xs)` or `-s` instead of `-xl`.
   - [x] Maybe also remove weight font and font size from blockquote. Low priority.
 - [x] is class scroll-content even defined anywhere?
-
-
-
-## Stage 2
-
-Now we must make it reactive to local file system changes. That means making a server that ships a little bit of JS to the doc,
-so that it can rehydrate whenever the server wants it to. Ideally this is very lightweight.
-
-All we really need is for the browser to react to a "refresh" signal. We could just have it show some `/tmp/blablapreview.html` file.
-The refresh signal is just some new, or the same, `/tmp/` file. We are probably best served implementing this with SSE
-
-- [ ] reload.js to listen to SSEs and do something?
+- [ ] Only the first callout in a file works as intended, all others are skipped?
+- [ ] contents of code blocks can exceed my 80ch horizontal limit on `div class='main-content'` and I don't know why (text just goes off into the distance)
+- [ ] MathML with Treeblood seems to fail fucking horribly all the time
+- [ ] Migration scripts for the vault. This time; with clearly defined rules around syntax & structure. I already kinda started this at the bottom of this file.
+- [ ] Git hooks / CI pipeline that enforces certain invariants, like vault/repo uniqueness of filenames, and valid filenames, and maybe even that all wikilinks are valid.
 - [ ] Make the 'render' command produce an actually standalone HTML file (by distributing the webawesome components and css myself)
 
-## Stage 3
+## Next Stage
 
 Now make the full application. with caching and metadata and login and page sharing and link archival and blabla
 
