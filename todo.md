@@ -21,6 +21,8 @@
 - [ ] Migration scripts for the vault. This time; with clearly defined rules around syntax & structure. I already kinda started this at the bottom of this file.
 - [ ] Git hooks / CI pipeline that enforces certain invariants, like vault/repo uniqueness of filenames, and valid filenames, and maybe even that all wikilinks are valid.
 - [ ] Make the 'render' command produce an actually standalone HTML file (by distributing the webawesome components and css myself)
+- [ ] Crashes when no headings in file
+- [ ] Crashed when you create a new file in a watched directory
 
 ## Next Stage
 
